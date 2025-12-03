@@ -1,24 +1,29 @@
 // remove NODE_OPTIONS from ts-dev-stack
 delete process.env.NODE_OPTIONS;
 
+// Load test environment before other imports
+import dotenv from 'dotenv';
+import path from 'path';
+import url from 'url';
+
+const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env.test') });
+
 import assert from 'assert';
 import fs from 'fs';
 import { linkModule, unlinkModule } from 'module-link-unlink';
 import os from 'os';
 import osShim from 'os-shim';
-import path from 'path';
 import Queue from 'queue-cb';
 import * as resolve from 'resolve';
 import shortHash from 'short-hash';
+import spawn from 'cross-spawn-cb';
 import { installGitRepo } from 'tsds-lib-test';
-import url from 'url';
 
 const tmpdir = os.tmpdir || osShim.tmpdir;
 const resolveSync = (resolve.default ?? resolve).sync;
 
-import { hasChanged } from 'tsds-publish';
-
-const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
+import publish, { hasChanged } from 'tsds-publish';
 
 const GITS = ['https://github.com/kmalakoff/parser-multipart.git'];
 
@@ -199,6 +204,40 @@ function addTests(repo) {
           assert.ok(result);
           assert.equal(typeof result.changed, 'boolean');
           assert.equal(typeof result.reason, 'string');
+          done();
+        });
+      });
+    });
+
+    describe('publish command', () => {
+      it('should block publish in test environment without --dry-run', (done) => {
+        // Bump version to trigger publish (not skip due to "no changes")
+        const pkg = JSON.parse(fs.readFileSync(path.join(dest, 'package.json'), 'utf8'));
+        pkg.version = '99.99.99';
+        fs.writeFileSync(path.join(dest, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
+
+        publish(['--yolo'], { cwd: dest }, (err): undefined => {
+          assert.ok(err);
+          assert.ok(err.message.includes('Cannot publish in test environment without --dry-run'));
+          done();
+        });
+      });
+
+      it('should pass safeguard with --dry-run in test environment', function (done) {
+        // Bump version to trigger publish (not skip due to "no changes")
+        const pkg = JSON.parse(fs.readFileSync(path.join(dest, 'package.json'), 'utf8'));
+        pkg.version = '99.99.99';
+        fs.writeFileSync(path.join(dest, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
+
+        publish(['--dry-run', '--yolo'], { cwd: dest, stdio: 'inherit' }, (err): undefined => {
+          // With --dry-run, the safeguard should NOT trigger
+          // The command may fail later (npm version/publish issues) but that's OK
+          // We just verify it got past the NODE_ENV=test safeguard
+          if (err && err.message.includes('Cannot publish in test environment')) {
+            done(new Error('Safeguard should not block with --dry-run'));
+            return;
+          }
+          // Any other error (or success) means the safeguard passed
           done();
         });
       });
