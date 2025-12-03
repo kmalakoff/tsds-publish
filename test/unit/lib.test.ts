@@ -17,7 +17,6 @@ import osShim from 'os-shim';
 import Queue from 'queue-cb';
 import * as resolve from 'resolve';
 import shortHash from 'short-hash';
-import spawn from 'cross-spawn-cb';
 import { installGitRepo } from 'tsds-lib-test';
 
 const tmpdir = os.tmpdir || osShim.tmpdir;
@@ -223,7 +222,7 @@ function addTests(repo) {
         });
       });
 
-      it('should pass safeguard with --dry-run in test environment', function (done) {
+      it('should pass safeguard with --dry-run in test environment', (done) => {
         // Bump version to trigger publish (not skip due to "no changes")
         const pkg = JSON.parse(fs.readFileSync(path.join(dest, 'package.json'), 'utf8'));
         pkg.version = '99.99.99';
