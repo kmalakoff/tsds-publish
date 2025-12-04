@@ -5,6 +5,7 @@ import type { Packument } from 'pacote';
 import path from 'path';
 import { type CommandOptions, wrapWorker } from 'tsds-lib';
 import url from 'url';
+import { stringStartsWith } from '../compat.ts';
 
 const major = +process.versions.node.split('.')[0];
 const version = major > 14 ? 'local' : 'stable';
@@ -30,7 +31,7 @@ function worker(options: CommandOptions, callback: HasChangedCallback): undefine
 
       // Get registry URL for scoped package from npm config
       let registry: string | undefined;
-      const scope = options.package.name.startsWith('@') ? options.package.name.split('/')[0] : undefined;
+      const scope = stringStartsWith(options.package.name, '@') ? options.package.name.split('/')[0] : undefined;
       if (scope) {
         try {
           const { stdout } = await execFileAsync('npm', ['config', 'get', `${scope}:registry`]);

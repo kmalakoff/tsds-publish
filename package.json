@@ -28,6 +28,7 @@
     "./package.json": "./package.json"
   },
   "main": "dist/cjs/index.js",
+  "source": "src/index.ts",
   "types": "dist/cjs/index.d.ts",
   "files": [
     "dist"
@@ -55,7 +56,7 @@
     "@types/mocha": "*",
     "@types/node": "*",
     "@types/pacote": "^11.1.8",
-    "dotenv": "*",
+    "dotenv": "2.0.0",
     "module-link-unlink": "*",
     "node-version-use": "*",
     "os-shim": "*",
@@ -66,8 +67,5 @@
   },
   "engines": {
     "node": ">=0.8"
-  },
-  "tsds": {
-    "source": "src/index.ts"
   }
 }
