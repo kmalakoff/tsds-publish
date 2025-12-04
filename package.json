@@ -44,18 +44,17 @@
   "dependencies": {
     "@npmcli/arborist": "*",
     "cross-spawn-cb": "*",
+    "fs-remove-compat": "*",
     "getopts-compat": "*",
     "npm-package-arg": "*",
     "pacote": "*",
     "queue-cb": "*",
-    "rimraf2": "*",
     "tsds-lib": "*"
   },
   "devDependencies": {
     "@types/mocha": "*",
     "@types/node": "*",
     "@types/pacote": "^11.1.8",
-    "dotenv": "2.0.0",
     "module-link-unlink": "*",
     "node-version-use": "*",
     "os-shim": "*",

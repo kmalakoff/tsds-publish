@@ -2,12 +2,13 @@
 delete process.env.NODE_OPTIONS;
 
 // Load test environment before other imports
-import dotenv from 'dotenv';
 import path from 'path';
+import { loadEnv } from 'tsds-lib';
+import { installGitRepo } from 'tsds-lib-test';
 import url from 'url';
 
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(__dirname, '..', '..', '.env.test') });
+loadEnv({ path: path.join(__dirname, '..', '..', '.env.test') });
 
 import assert from 'assert';
 import fs from 'fs';
@@ -17,7 +18,6 @@ import osShim from 'os-shim';
 import Queue from 'queue-cb';
 import * as resolve from 'resolve';
 import shortHash from 'short-hash';
-import { installGitRepo } from 'tsds-lib-test';
 
 const tmpdir = os.tmpdir || osShim.tmpdir;
 const resolveSync = (resolve.default ?? resolve).sync;
