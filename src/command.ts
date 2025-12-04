@@ -1,9 +1,9 @@
 import spawn from 'cross-spawn-cb';
 import fs from 'fs';
+import { safeRm } from 'fs-remove-compat';
 import getopts from 'getopts-compat';
 import path from 'path';
 import Queue from 'queue-cb';
-import rimraf2 from 'rimraf2';
 import { type CommandCallback, type CommandOptions, wrapWorker } from 'tsds-lib';
 import url from 'url';
 import hasChanged from './lib/hasChanged.ts';
@@ -41,7 +41,7 @@ function worker(args: string[], options_: CommandOptions, callback: CommandCallb
 
     // run tests
     if (!opts.yolo) {
-      queue.defer(rimraf2.bind(null, path.join(cwd as string, 'node_modules'), { disableGlob: true }));
+      queue.defer((cb) => safeRm(path.join(cwd as string, 'node_modules'), cb));
       queue.defer(spawn.bind(null, 'npm', ['ci'], { ...options, cwd }));
       queue.defer(spawn.bind(null, 'npm', ['test'], { ...options, cwd }));
     }
