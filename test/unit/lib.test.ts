@@ -90,8 +90,8 @@ function addTests(repo) {
           }
           assert.ok(result);
           assert.equal(result.changed, true);
-          assert.ok(result.reason.includes('Version differs'));
-          assert.ok(result.reason.includes('99.99.99'));
+          assert.ok(result.reason.indexOf('Version differs') >= 0);
+          assert.ok(result.reason.indexOf('99.99.99') >= 0);
           done();
         });
       });
@@ -108,8 +108,8 @@ function addTests(repo) {
           }
           assert.ok(result);
           assert.equal(result.changed, true);
-          assert.ok(result.reason.includes('Version differs'));
-          assert.ok(result.reason.includes('0.0.1'));
+          assert.ok(result.reason.indexOf('Version differs') >= 0);
+          assert.ok(result.reason.indexOf('0.0.1') >= 0);
           done();
         });
       });
@@ -121,7 +121,7 @@ function addTests(repo) {
             return;
           }
           assert.ok(result);
-          assert.ok(!result.reason.includes('Version differs'));
+          assert.ok(result.reason.indexOf('Version differs') < 0);
           done();
         });
       });
@@ -139,11 +139,11 @@ function addTests(repo) {
           // This test validates the code works, but may detect real changes
           if (result.changed) {
             // If changes detected, verify it's because of code differences
-            assert.ok(result.reason.includes('Code changes detected') || result.reason.includes('Version differs'));
+            assert.ok(result.reason.indexOf('Code changes detected') >= 0 || result.reason.indexOf('Version differs') >= 0);
           } else {
             // If no changes, verify correct message
-            assert.ok(result.reason.includes('No changes detected'));
-            assert.ok(result.reason.includes('hash:'));
+            assert.ok(result.reason.indexOf('No changes detected') >= 0);
+            assert.ok(result.reason.indexOf('hash:') >= 0);
           }
           done();
         });
@@ -160,9 +160,9 @@ function addTests(repo) {
           }
           assert.ok(result);
           assert.equal(result.changed, true);
-          assert.ok(result.reason.includes('Code changes detected'));
-          assert.ok(result.reason.includes('registry:'));
-          assert.ok(result.reason.includes('local:'));
+          assert.ok(result.reason.indexOf('Code changes detected') >= 0);
+          assert.ok(result.reason.indexOf('registry:') >= 0);
+          assert.ok(result.reason.indexOf('local:') >= 0);
           done();
         });
       });
@@ -181,7 +181,7 @@ function addTests(repo) {
           }
           assert.ok(result);
           assert.equal(result.changed, true);
-          assert.ok(result.reason.includes('Package not found in registry') || result.reason.includes('first publish'));
+          assert.ok(result.reason.indexOf('Package not found in registry') >= 0 || result.reason.indexOf('first publish') >= 0);
           done();
         });
       });
@@ -217,7 +217,7 @@ function addTests(repo) {
 
         publish(['--yolo'], { cwd: dest }, (err): undefined => {
           assert.ok(err);
-          assert.ok(err.message.includes('Cannot publish in test environment without --dry-run'));
+          assert.ok(err.message.indexOf('Cannot publish in test environment without --dry-run') >= 0);
           done();
         });
       });
@@ -232,7 +232,7 @@ function addTests(repo) {
           // With --dry-run, the safeguard should NOT trigger
           // The command may fail later (npm version/publish issues) but that's OK
           // We just verify it got past the NODE_ENV=test safeguard
-          if (err && err.message.includes('Cannot publish in test environment')) {
+          if (err && err.message.indexOf('Cannot publish in test environment') >= 0) {
             done(new Error('Safeguard should not block with --dry-run'));
             return;
           }
