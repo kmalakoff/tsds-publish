@@ -42,19 +42,16 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "@npmcli/arborist": "*",
     "cross-spawn-cb": "*",
     "fs-remove-compat": "*",
     "getopts-compat": "*",
-    "npm-package-arg": "*",
-    "pacote": "*",
+    "npm-needs-publish": "*",
     "queue-cb": "*",
     "tsds-lib": "*"
   },
   "devDependencies": {
     "@types/mocha": "*",
     "@types/node": "*",
-    "@types/pacote": "^11.1.8",
     "module-link-unlink": "*",
     "node-version-use": "*",
     "os-shim": "*",
