@@ -42,24 +42,24 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "*",
-    "fs-remove-compat": "*",
-    "getopts-compat": "*",
-    "npm-needs-publish": "*",
-    "queue-cb": "*",
-    "tsds-lib": "*"
+    "cross-spawn-cb": "^2.4.10",
+    "fs-remove-compat": "^0.2.1",
+    "getopts-compat": "^2.2.6",
+    "npm-needs-publish": "^0.1.2",
+    "queue-cb": "^1.6.1",
+    "tsds-lib": "^1.20.0"
   },
   "devDependencies": {
-    "@types/mocha": "*",
-    "@types/node": "*",
-    "module-link-unlink": "*",
-    "node-version-use": "*",
-    "os-shim": "*",
-    "resolve": "*",
-    "short-hash": "*",
-    "ts-dev-stack": "*",
-    "tsds-config": "*",
-    "tsds-lib-test": "*"
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.10.2",
+    "module-link-unlink": "^1.0.9",
+    "node-version-use": "^1.9.9",
+    "os-shim": "^0.1.3",
+    "resolve": "^1.22.11",
+    "short-hash": "^1.0.0",
+    "ts-dev-stack": "^1.21.2",
+    "tsds-config": "^0.2.0",
+    "tsds-lib-test": "^1.19.4"
   },
   "engines": {
     "node": ">=0.8"
