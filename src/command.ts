@@ -2,9 +2,10 @@ import spawn from 'cross-spawn-cb';
 import fs from 'fs';
 import { safeRm } from 'fs-remove-compat';
 import getopts from 'getopts-compat';
+import { wrap } from 'node-version-call';
 import path from 'path';
 import Queue from 'queue-cb';
-import { type CommandCallback, type CommandOptions, wrapWorker } from 'tsds-lib';
+import type { CommandCallback, CommandOptions } from 'tsds-lib';
 import url from 'url';
 import hasChanged from './lib/hasChanged.ts';
 
@@ -12,7 +13,7 @@ const major = +process.versions.node.split('.')[0];
 const version = major >= 18 ? 'local' : 'stable';
 const __dirname = path.dirname(typeof __filename === 'undefined' ? url.fileURLToPath(import.meta.url) : __filename);
 const dist = path.join(__dirname, '..');
-const workerWrapper = wrapWorker(path.join(dist, 'cjs', 'command.js'));
+const workerWrapper = wrap(path.join(dist, 'cjs', 'command.js'));
 
 function worker(args: string[], options_: CommandOptions, callback: CommandCallback): undefined {
   const cwd = options_.cwd || process.cwd();
