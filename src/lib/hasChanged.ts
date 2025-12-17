@@ -1,6 +1,7 @@
 import Module from 'module';
+import { wrap } from 'node-version-call';
 import path from 'path';
-import { type CommandOptions, wrapWorker } from 'tsds-lib';
+import type { CommandOptions } from 'tsds-lib';
 import url from 'url';
 
 const major = +process.versions.node.split('.')[0];
@@ -8,7 +9,7 @@ const version = major >= 18 ? 'local' : 'stable';
 const _require = typeof require === 'undefined' ? Module.createRequire(import.meta.url) : require;
 const __dirname = path.dirname(typeof __filename === 'undefined' ? url.fileURLToPath(import.meta.url) : __filename);
 const dist = path.join(__dirname, '..', '..');
-const workerWrapper = wrapWorker(path.join(dist, 'cjs', 'lib', 'hasChanged.js'));
+const workerWrapper = wrap(path.join(dist, 'cjs', 'lib', 'hasChanged.js'));
 
 import type { HasChangedCallback } from '../types.ts';
 
