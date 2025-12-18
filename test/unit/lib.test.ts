@@ -36,7 +36,7 @@ function addTests(repo) {
     const deps = { ...(modulePackage.dependencies || {}), ...(modulePackage.peerDependencies || {}) };
 
     before((cb) => {
-      installGitRepo(repo, dest, (err): undefined => {
+      installGitRepo(repo, dest, (err): void => {
         if (err) {
           cb(err);
           return;
@@ -83,7 +83,7 @@ function addTests(repo) {
         pkg.version = '99.99.99';
         fs.writeFileSync(path.join(dest, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
 
-        hasChanged({ cwd: dest }, (err, result): undefined => {
+        hasChanged({ cwd: dest }, (err, result): void => {
           if (err) {
             done(err);
             return;
@@ -101,7 +101,7 @@ function addTests(repo) {
         pkg.version = '0.0.1';
         fs.writeFileSync(path.join(dest, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
 
-        hasChanged({ cwd: dest }, (err, result): undefined => {
+        hasChanged({ cwd: dest }, (err, result): void => {
           if (err) {
             done(err);
             return;
@@ -115,7 +115,7 @@ function addTests(repo) {
       });
 
       it('should proceed to integrity check when versions match', (done) => {
-        hasChanged({ cwd: dest }, (err, result): undefined => {
+        hasChanged({ cwd: dest }, (err, result): void => {
           if (err) {
             done(err);
             return;
@@ -129,7 +129,7 @@ function addTests(repo) {
 
     describe('Integrity comparison (second check)', () => {
       it('should skip when versions match and hashes match', (done) => {
-        hasChanged({ cwd: dest }, (err, result): undefined => {
+        hasChanged({ cwd: dest }, (err, result): void => {
           if (err) {
             done(err);
             return;
@@ -146,7 +146,7 @@ function addTests(repo) {
         const srcPath = path.join(dest, 'src', 'index.js');
         fs.appendFileSync(srcPath, '\n// Test modification to trigger hash difference\n');
 
-        hasChanged({ cwd: dest }, (err, result): undefined => {
+        hasChanged({ cwd: dest }, (err, result): void => {
           if (err) {
             done(err);
             return;
@@ -165,7 +165,7 @@ function addTests(repo) {
         pkg.name = `@test-tsds-publish/nonexistent-package-${Date.now()}`;
         fs.writeFileSync(path.join(dest, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
 
-        hasChanged({ cwd: dest }, (err, result): undefined => {
+        hasChanged({ cwd: dest }, (err, result): void => {
           if (err) {
             done(err);
             return;
@@ -186,7 +186,7 @@ function addTests(repo) {
 
     describe('Scoped packages', () => {
       it('should use scoped registry from npm config', (done) => {
-        hasChanged({ cwd: dest }, (err, result): undefined => {
+        hasChanged({ cwd: dest }, (err, result): void => {
           if (err) {
             done(err);
             return;
@@ -206,7 +206,7 @@ function addTests(repo) {
         pkg.version = '99.99.99';
         fs.writeFileSync(path.join(dest, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
 
-        publish(['--yolo'], { cwd: dest }, (err): undefined => {
+        publish(['--yolo'], { cwd: dest }, (err): void => {
           assert.ok(err);
           assert.ok(err.message.indexOf('Cannot publish in test environment without --dry-run') >= 0);
           done();
@@ -219,7 +219,7 @@ function addTests(repo) {
         pkg.version = '99.99.99';
         fs.writeFileSync(path.join(dest, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
 
-        publish(['--dry-run', '--yolo'], { cwd: dest, stdio: 'inherit' }, (err): undefined => {
+        publish(['--dry-run', '--yolo'], { cwd: dest, stdio: 'inherit' }, (err): void => {
           // With --dry-run, the safeguard should NOT trigger
           // The command may fail later (npm version/publish issues) but that's OK
           // We just verify it got past the NODE_ENV=test safeguard
