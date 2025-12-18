@@ -15,7 +15,7 @@ const __dirname = path.dirname(typeof __filename === 'undefined' ? url.fileURLTo
 const dist = path.join(__dirname, '..');
 const workerWrapper = wrap(path.join(dist, 'cjs', 'command.js'));
 
-function worker(args: string[], options_: CommandOptions, callback: CommandCallback): undefined {
+function worker(args: string[], options_: CommandOptions, callback: CommandCallback) {
   const cwd = options_.cwd || process.cwd();
   const options = { ...options_ } as CommandOptions;
   options.package = options.package || JSON.parse(fs.readFileSync(path.join(cwd as string, 'package.json'), 'utf8'));
@@ -25,11 +25,8 @@ function worker(args: string[], options_: CommandOptions, callback: CommandCallb
   }
 
   const opts = getopts(args, { alias: { otp: 'o', 'dry-run': 'd' }, boolean: ['yolo', 'dry-run'] });
-  hasChanged(options, (err, result): undefined => {
-    if (err) {
-      callback(err);
-      return;
-    }
+  hasChanged(options, (err, result): void => {
+    if (err) return callback(err);
     if (!result.changed) {
       console.log(`Skipping ${options.package.name}. ${result.reason}`);
       callback();
@@ -75,6 +72,6 @@ function worker(args: string[], options_: CommandOptions, callback: CommandCallb
   });
 }
 
-export default function publish(args: string[], options: CommandOptions, callback: CommandCallback): undefined {
+export default function publish(args: string[], options: CommandOptions, callback: CommandCallback): void {
   version !== 'local' ? workerWrapper(version, args, options, callback) : worker(args, options, callback);
 }
