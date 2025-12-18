@@ -42,11 +42,11 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "cross-spawn-cb": "^2.0.0",
+    "cross-spawn-cb": "^3.0.0",
     "fs-remove-compat": "^1.0.0",
     "getopts-compat": "^2.2.6",
     "node-version-call": "^1.11.0",
-    "npm-needs-publish": "^0.1.5",
+    "npm-needs-publish": "^1.0.0",
     "queue-cb": "^1.0.0",
     "tsds-lib": "^1.20.0"
   },

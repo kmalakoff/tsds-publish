@@ -13,7 +13,7 @@ const workerWrapper = wrap(path.join(dist, 'cjs', 'lib', 'hasChanged.js'));
 
 import type { HasChangedCallback } from '../types.ts';
 
-function worker(options: CommandOptions, callback: HasChangedCallback): undefined {
+function worker(options: CommandOptions, callback: HasChangedCallback) {
   const cwd: string = (options.cwd as string) || process.cwd();
   const { needsPublish } = _require('npm-needs-publish');
 
@@ -27,6 +27,6 @@ function worker(options: CommandOptions, callback: HasChangedCallback): undefine
     .catch(callback);
 }
 
-export default function hasChanged(options: CommandOptions, callback: HasChangedCallback): undefined {
+export default function hasChanged(options: CommandOptions, callback: HasChangedCallback): void {
   version !== 'local' ? workerWrapper(version, options, callback) : worker(options, callback);
 }
