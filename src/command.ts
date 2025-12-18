@@ -2,7 +2,7 @@ import spawn from 'cross-spawn-cb';
 import fs from 'fs';
 import { safeRm } from 'fs-remove-compat';
 import getopts from 'getopts-compat';
-import { wrap } from 'node-version-call';
+import { bind } from 'node-version-call';
 import path from 'path';
 import Queue from 'queue-cb';
 import type { CommandCallback, CommandOptions } from 'tsds-lib';
@@ -10,12 +10,10 @@ import url from 'url';
 import hasChanged from './lib/hasChanged.ts';
 
 const major = +process.versions.node.split('.')[0];
-const version = major >= 18 ? 'local' : 'stable';
 const __dirname = path.dirname(typeof __filename === 'undefined' ? url.fileURLToPath(import.meta.url) : __filename);
 const dist = path.join(__dirname, '..');
-const workerWrapper = wrap(path.join(dist, 'cjs', 'command.js'));
 
-function worker(args: string[], options_: CommandOptions, callback: CommandCallback) {
+function run(args: string[], options_: CommandOptions, callback: CommandCallback) {
   const cwd = options_.cwd || process.cwd();
   const options = { ...options_ } as CommandOptions;
   options.package = options.package || JSON.parse(fs.readFileSync(path.join(cwd as string, 'package.json'), 'utf8'));
@@ -72,6 +70,8 @@ function worker(args: string[], options_: CommandOptions, callback: CommandCallb
   });
 }
 
+const worker = major >= 20 ? run : bind('>=20', path.join(dist, 'cjs', 'command.js'), { callbacks: true });
+
 export default function publish(args: string[], options: CommandOptions, callback: CommandCallback): void {
-  version !== 'local' ? workerWrapper(version, args, options, callback) : worker(args, options, callback);
+  worker(args, options, callback);
 }
