@@ -37,7 +37,7 @@ function run(args: string[], options_: CommandOptions, callback: CommandCallback
 
     // run tests
     if (!opts.yolo) {
-      queue.defer((cb) => safeRm(path.join(cwd as string, 'node_modules'), cb));
+      queue.defer(safeRm.bind(null, path.join(cwd as string, 'node_modules')));
       queue.defer(spawn.bind(null, 'npm', ['ci'], { ...options, cwd }));
       queue.defer(spawn.bind(null, 'npm', ['test'], { ...options, cwd }));
     }
@@ -61,9 +61,6 @@ function run(args: string[], options_: CommandOptions, callback: CommandCallback
     if (opts['dry-run']) publishArgs.push('--dry-run');
     if (opts.otp) publishArgs.push(`--otp=${opts.otp}`);
     queue.defer(spawn.bind(null, 'npm', publishArgs, options));
-
-    // do post actions
-    // Note: npm version already runs the "version" script automatically, so no need to run it again
     queue.defer((cb) => spawn('git', ['add', '.'], options, cb.bind(null, null)));
     queue.defer((cb) => spawn('git', ['commit', '-m', `${options.package.version}`], options, cb.bind(null, null)));
     queue.await(callback);
