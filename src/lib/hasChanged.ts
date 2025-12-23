@@ -25,7 +25,9 @@ function run(options: CommandOptions, callback: HasChangedCallback) {
     .catch(callback);
 }
 
-const worker = major >= 20 ? run : bind('>=20', path.join(dist, 'cjs', 'lib', 'hasChanged.js'), { callbacks: true });
+type hasChangedFunction = (options: CommandOptions, callback: HasChangedCallback) => void;
+
+const worker = (major >= 20 ? run : bind('>=20', path.join(dist, 'cjs', 'lib', 'hasChanged.js'), { callbacks: true })) as hasChangedFunction;
 
 export default function hasChanged(options: CommandOptions, callback: HasChangedCallback): void {
   worker(options, callback);
