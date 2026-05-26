@@ -17,27 +17,27 @@ function run(args: string[], options_: CommandOptions, callback: CommandCallback
   const cwd = options_.cwd || process.cwd();
   const options = { ...options_ } as CommandOptions;
   options.package = options.package || JSON.parse(fs.readFileSync(path.join(cwd as string, 'package.json'), 'utf8'));
-  if (options.package.private) {
-    console.log(`Skipping ${options.package.name}. Private`);
+  if (options.package?.private) {
+    console.log(`Skipping ${options.package?.name}. Private`);
     return callback();
   }
 
   const opts = getopts(args, { alias: { otp: 'o', 'dry-run': 'd' }, boolean: ['yolo', 'dry-run'] });
   hasChanged(options, (err, result): void => {
     if (err) return callback(err);
-    if (!result.changed) {
-      console.log(`Skipping ${options.package.name}. ${result.reason}`);
+    if (!result?.changed) {
+      console.log(`Skipping ${options.package?.name}. ${result?.reason}`);
       callback();
       return;
     }
 
-    console.log(`Publishing ${options.package.name}. ${result.reason}`);
+    console.log(`Publishing ${options.package?.name}. ${result?.reason}`);
 
     const queue = new Queue(1);
 
     // run tests
     if (!opts.yolo) {
-      queue.defer(safeRm.bind(null, path.join(cwd as string, 'node_modules')));
+      queue.defer((cb) => safeRm(path.join(cwd as string, 'node_modules'), (err) => cb(err ?? undefined)));
       queue.defer(spawn.bind(null, 'npm', ['ci'], { ...options, cwd }));
       queue.defer(spawn.bind(null, 'npm', ['test'], { ...options, cwd }));
     }
@@ -61,8 +61,8 @@ function run(args: string[], options_: CommandOptions, callback: CommandCallback
     if (opts['dry-run']) publishArgs.push('--dry-run');
     if (opts.otp) publishArgs.push(`--otp=${opts.otp}`);
     queue.defer(spawn.bind(null, 'npm', publishArgs, options));
-    queue.defer((cb) => spawn('git', ['add', '.'], options, cb.bind(null, null)));
-    queue.defer((cb) => spawn('git', ['commit', '-m', `${options.package.version}`], options, cb.bind(null, null)));
+    queue.defer((cb) => spawn('git', ['add', '.'], options, () => cb()));
+    queue.defer((cb) => spawn('git', ['commit', '-m', `${options.package?.version}`], options, () => cb()));
     queue.await(callback);
   });
 }
