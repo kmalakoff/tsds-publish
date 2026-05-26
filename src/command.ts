@@ -37,7 +37,7 @@ function run(args: string[], options_: CommandOptions, callback: CommandCallback
 
     // run tests
     if (!opts.yolo) {
-      queue.defer((cb) => safeRm(path.join(cwd as string, 'node_modules'), (err) => cb(err ?? undefined)));
+      queue.defer((cb) => safeRm(path.join(cwd as string, 'node_modules'), (err) => cb(err)));
       queue.defer(spawn.bind(null, 'npm', ['ci'], { ...options, cwd }));
       queue.defer(spawn.bind(null, 'npm', ['test'], { ...options, cwd }));
     }
