@@ -16,8 +16,8 @@ function run(options: CommandOptions, callback: HasChangedCallback) {
   const { needsPublish } = _require('npm-needs-publish');
 
   needsPublish({ cwd })
-    .then((result) => {
-      callback(null, {
+    .then((result: { needsPublish: boolean; reason: string }) => {
+      callback(undefined, {
         changed: result.needsPublish,
         reason: result.reason,
       });

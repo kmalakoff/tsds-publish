@@ -26,7 +26,7 @@ import publish, { hasChanged } from 'tsds-publish';
 
 const GITS = ['https://github.com/kmalakoff/parser-multipart.git'];
 
-function addTests(repo) {
+function addTests(repo: string) {
   const repoName = path.basename(repo, path.extname(repo));
   describe(repoName, () => {
     const dest = path.join(tmpdir(), 'tsds-publish', shortHash(process.cwd()), repoName);
@@ -37,10 +37,7 @@ function addTests(repo) {
 
     before((cb) => {
       installGitRepo(repo, dest, (err): void => {
-        if (err) {
-          cb(err);
-          return;
-        }
+        if (err) return cb(err);
 
         const queue = new Queue();
         queue.defer(linkModule.bind(null, modulePath, nodeModules));
@@ -84,10 +81,8 @@ function addTests(repo) {
         fs.writeFileSync(path.join(dest, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
 
         hasChanged({ cwd: dest }, (err, result): void => {
-          if (err) {
-            done(err);
-            return;
-          }
+          if (err) return done(err);
+
           assert.ok(result);
           assert.equal(result.changed, true);
           assert.ok(result.reason.indexOf('Version differs') >= 0);
@@ -102,10 +97,8 @@ function addTests(repo) {
         fs.writeFileSync(path.join(dest, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
 
         hasChanged({ cwd: dest }, (err, result): void => {
-          if (err) {
-            done(err);
-            return;
-          }
+          if (err) return done(err);
+
           assert.ok(result);
           assert.equal(result.changed, true);
           assert.ok(result.reason.indexOf('Version differs') >= 0);
@@ -116,10 +109,8 @@ function addTests(repo) {
 
       it('should proceed to integrity check when versions match', (done) => {
         hasChanged({ cwd: dest }, (err, result): void => {
-          if (err) {
-            done(err);
-            return;
-          }
+          if (err) return done(err);
+
           assert.ok(result);
           assert.ok(result.reason.indexOf('Version differs') < 0);
           done();
@@ -130,10 +121,8 @@ function addTests(repo) {
     describe('Integrity comparison (second check)', () => {
       it('should skip when versions match and hashes match', (done) => {
         hasChanged({ cwd: dest }, (err, result): void => {
-          if (err) {
-            done(err);
-            return;
-          }
+          if (err) return done(err);
+
           assert.ok(result);
           // Note: parser-multipart git clone may have changes not in registry
           // This test validates the code works, but may detect real changes
@@ -147,10 +136,8 @@ function addTests(repo) {
         fs.appendFileSync(srcPath, '\n// Test modification to trigger hash difference\n');
 
         hasChanged({ cwd: dest }, (err, result): void => {
-          if (err) {
-            done(err);
-            return;
-          }
+          if (err) return done(err);
+
           assert.ok(result);
           assert.equal(result.changed, true);
           assert.ok(result.reason);
@@ -166,10 +153,8 @@ function addTests(repo) {
         fs.writeFileSync(path.join(dest, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
 
         hasChanged({ cwd: dest }, (err, result): void => {
-          if (err) {
-            done(err);
-            return;
-          }
+          if (err) return done(err);
+
           assert.ok(result);
           assert.equal(result.changed, true);
           assert.ok(result.reason.indexOf('Package not found in registry') >= 0 || result.reason.indexOf('first publish') >= 0);
@@ -187,10 +172,8 @@ function addTests(repo) {
     describe('Scoped packages', () => {
       it('should use scoped registry from npm config', (done) => {
         hasChanged({ cwd: dest }, (err, result): void => {
-          if (err) {
-            done(err);
-            return;
-          }
+          if (err) return done(err);
+
           assert.ok(result);
           assert.equal(typeof result.changed, 'boolean');
           assert.equal(typeof result.reason, 'string');
