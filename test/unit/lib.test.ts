@@ -13,13 +13,10 @@ loadEnv({ path: path.join(__dirname, '..', '..', '.env.test') });
 import assert from 'assert';
 import fs from 'fs';
 import { linkModule, unlinkModule } from 'module-link-unlink';
-import os from 'os';
-import osShim from 'os-shim';
 import Queue from 'queue-cb';
 import * as resolve from 'resolve';
 import shortHash from 'short-hash';
 
-const tmpdir = os.tmpdir || osShim.tmpdir;
 const resolveSync = (resolve.default ?? resolve).sync;
 
 import publish, { hasChanged } from 'tsds-publish';
@@ -29,8 +26,8 @@ const GITS = ['https://github.com/kmalakoff/parser-multipart.git'];
 function addTests(repo: string) {
   const repoName = path.basename(repo, path.extname(repo));
   describe(repoName, () => {
-    const dest = path.join(tmpdir(), 'tsds-publish', shortHash(process.cwd()), repoName);
     const modulePath = fs.realpathSync(path.join(__dirname, '..', '..'));
+    const dest = path.join(modulePath, '.tmp', 'cache', shortHash(process.cwd()), repoName);
     const modulePackage = JSON.parse(fs.readFileSync(path.join(modulePath, 'package.json'), 'utf8'));
     const nodeModules = path.join(dest, 'node_modules');
     const deps = { ...(modulePackage.dependencies || {}), ...(modulePackage.peerDependencies || {}) };
@@ -160,12 +157,6 @@ function addTests(repo: string) {
           assert.ok(result.reason.indexOf('Package not found in registry') >= 0 || result.reason.indexOf('first publish') >= 0);
           done();
         });
-      });
-
-      it('should handle unknown errors gracefully', function (done) {
-        // Hard to reliably trigger non-E404 errors - skip for now
-        this.skip();
-        done();
       });
     });
 
