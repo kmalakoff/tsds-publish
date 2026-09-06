@@ -1,13 +1,13 @@
 import spawn from 'cross-spawn-cb';
 import fs from 'fs';
 import { safeRm } from 'fs-remove-compat';
-import getopts from 'getopts-compat';
 import { bind } from 'node-version-call';
 import path from 'path';
 import Queue from 'queue-cb';
 import type { CommandCallback, CommandOptions } from 'tsds-lib';
 import url from 'url';
 import hasChanged from './lib/hasChanged.ts';
+import parseArgs from './lib/parseArgs.ts';
 
 const major = +process.versions.node.split('.')[0];
 const __dirname = path.dirname(typeof __filename === 'undefined' ? url.fileURLToPath(import.meta.url) : __filename);
@@ -22,7 +22,7 @@ function run(args: string[], options_: CommandOptions, callback: CommandCallback
     return callback();
   }
 
-  const opts = getopts(args, { alias: { otp: 'o', 'dry-run': 'd' }, boolean: ['yolo', 'dry-run'] });
+  const opts = parseArgs(args);
   hasChanged(options, (err, result): void => {
     if (err) return callback(err);
     if (!result?.changed) {
@@ -43,7 +43,7 @@ function run(args: string[], options_: CommandOptions, callback: CommandCallback
     }
 
     // update the version
-    const versionArgs = ['version', opts._.length > 0 ? opts._[0] : 'patch'];
+    const versionArgs = ['version', opts.version];
     queue.defer((cb) =>
       spawn('npm', versionArgs, options, (err) => {
         if (err) return cb(err);
@@ -54,13 +54,10 @@ function run(args: string[], options_: CommandOptions, callback: CommandCallback
 
     // do publish
     // Safeguard: block actual publish in test environment without --dry-run
-    if (process.env.NODE_ENV === 'test' && !opts['dry-run']) {
+    if (process.env.NODE_ENV === 'test' && !opts.dryRun) {
       return callback(new Error('Cannot publish in test environment without --dry-run'));
     }
-    const publishArgs = ['publish'];
-    if (opts['dry-run']) publishArgs.push('--dry-run');
-    if (opts.otp) publishArgs.push(`--otp=${opts.otp}`);
-    queue.defer(spawn.bind(null, 'npm', publishArgs, options));
+    queue.defer(spawn.bind(null, 'npm', opts.publishArgs, options));
     queue.defer((cb) => spawn('git', ['add', '.'], options, () => cb()));
     queue.defer((cb) => spawn('git', ['commit', '-m', `${options.package?.version}`], options, () => cb()));
     queue.await(callback);
