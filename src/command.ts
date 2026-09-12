@@ -23,7 +23,7 @@ function worker(args: string[], options_: CommandOptions, callback: CommandCallb
     return callback();
   }
 
-  const opts = getopts(args, { alias: { otp: 'o' }, boolean: ['yolo'] });
+  const opts = getopts(args, { alias: { otp: 'o', 'dry-run': 'd' }, boolean: ['yolo', 'dry-run'] });
   hasChanged(options, (err, result): undefined => {
     if (err) {
       callback(err);
@@ -57,8 +57,13 @@ function worker(args: string[], options_: CommandOptions, callback: CommandCallb
     );
 
     // do publish
+    // Safeguard: block actual publish in test environment without --dry-run
+    if (process.env.NODE_ENV === 'test' && !opts['dry-run']) {
+      return callback(new Error('Cannot publish in test environment without --dry-run'));
+    }
     const publishArgs = ['publish'];
-    if (opts.otp) Array.prototype.push.apply(publishArgs, [`--otp=${opts.otp}`]);
+    if (opts['dry-run']) publishArgs.push('--dry-run');
+    if (opts.otp) publishArgs.push(`--otp=${opts.otp}`);
     queue.defer(spawn.bind(null, 'npm', publishArgs, options));
 
     // do post actions
