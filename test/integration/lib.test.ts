@@ -1,14 +1,12 @@
 // remove NODE_OPTIONS to not interfere with tests
 delete process.env.NODE_OPTIONS;
 
-// Load test environment before other imports
 import path from 'path';
-import { loadEnv } from 'tsds-lib';
 import { installGitRepo } from 'tsds-lib-test';
 import url from 'url';
 
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
-loadEnv({ path: path.join(__dirname, '..', '..', '.env.test') });
+process.env.NODE_ENV = 'test';
 
 import assert from 'assert';
 import fs from 'fs';
