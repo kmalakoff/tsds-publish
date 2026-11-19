@@ -13,7 +13,6 @@ import fs from 'fs';
 import { linkModule, unlinkModule } from 'module-link-unlink';
 import Queue from 'queue-cb';
 import * as resolve from 'resolve';
-import shortHash from 'short-hash';
 
 const resolveSync = (resolve.default ?? resolve).sync;
 
@@ -25,7 +24,7 @@ function addTests(repo: string) {
   const repoName = path.basename(repo, path.extname(repo));
   describe(repoName, () => {
     const modulePath = fs.realpathSync(path.join(__dirname, '..', '..'));
-    const dest = path.join(modulePath, '.tmp', 'cache', shortHash(process.cwd()), repoName);
+    const dest = path.join(modulePath, '.cache', repoName);
     const modulePackage = JSON.parse(fs.readFileSync(path.join(modulePath, 'package.json'), 'utf8'));
     const nodeModules = path.join(dest, 'node_modules');
     const deps = { ...(modulePackage.dependencies || {}), ...(modulePackage.peerDependencies || {}) };
